@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Binder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.styles.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+</head>
+
+<body>
+
+    <!-- Hidden tags -->
+    <div id="semester" hidden></div>
+    <div id="year" hidden></div>
+
+    <!-- Button trigger modal -->
+    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#catsweb_semesterModal">
+        Launch demo modal
+    </button> -->
+
+    <!-- Big Class Modal -->
+    <div id="individual_class_modal" class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog"
+        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <h3 id="class_name" class="text-center">MGT 4335.256</h3>
+                <div class="row text-center">
+                    <div id="class_professor" class="col-6">
+                        Professor: David Cameron
+                    </div>
+                    <div id="class_location" class="col-6">
+                        Where: MCCOY 203A
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-6">
+                        Enrolled Students: <div id="enrolled_students">56</div>
+                    </div>
+                    <div id="max_capacity" class="col-6">
+                        Max Capacity: 60
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-6">
+                        Potentially Enrolled: <div id="potentially_enrolled">58</div>
+                    </div>
+                </div>
+
+                <!-- Override Table -->
+                <table id="overrideTable" class="table table-striped table-bordered" cellspacing="0"
+                    width="100%">
+                    <thead>
+                        <tr>
+                            <th class="th-sm">Student Name
+                            </th>
+                            <th class="th-sm">A0 Number
+                            </th>
+                            <th class="th-sm">NetID
+                            </th>
+                            <th class="th-sm">Date
+                            </th>
+                            <th class="th-sm">Creator
+                            </th>
+                            <th class="th-sm">Registered
+                            </th>
+                            <th class="th-sm">Delete
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="override-table-body">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Student Name
+                            </th>
+                            <th>A0 Number
+                            </th>
+                            <th>NetID
+                            </th>
+                            <th>Date
+                            </th>
+                            <th>Creator
+                            </th>
+                            <th>Registered
+                            </th>
+                            <th>Delete
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Override Report Table -->
+    <div id="generated_override_report_modal" class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog"
+        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+
+                <!-- Override Table -->
+                <table id="generated_overrideTable" class="table table-striped table-bordered table-sm" cellspacing="0"
+                    width="100%">
+                    <thead>
+                        <tr>
+                            <th class="th-sm">Student Name
+                            </th>
+                            <th class="th-sm">A0 Number
+                            </th>
+                            <th class="th-sm">NetID
+                            </th>
+                            <th class="th-sm">Date
+                            </th>
+                            <th class="th-sm">Creator
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="generated_override-table-body">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Student Name
+                            </th>
+                            <th>A0 Number
+                            </th>
+                            <th>NetID
+                            </th>
+                            <th>Date
+                            </th>
+                            <th>Creator
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Individual Class Table -->
+    <div id="generated_individual_class_modal" class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog"
+        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div id="generated_individual_class_modal_body" class="modal-content">
+
+                <!-- Override Table -->
+                <table id="generated_individual_classTable" class="table table-striped table-bordered table-sm"
+                    cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="th-sm">Section
+                            </th>
+                            <th class="th-sm">Days
+                            </th>
+                            <th class="th-sm">Time
+                            </th>
+                            <th class="th-sm">Num Enrollment
+                            </th>
+                            <th class="th-sm">Max Capacity
+                            </th>
+                            <th class="th-sm">Percentage Filled
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="generated_individual_class-table-body">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Section
+                            </th>
+                            <th>Days
+                            </th>
+                            <th>Time
+                            </th>
+                            <th>Num Enrollment
+                            </th>
+                            <th>Max Capacity
+                            </th>
+                            <th>Percentage Filled
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Incorrect Password -->
+    <div class="modal fade" id="incorrectPasswordModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create Semester</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    Incorrect Username or Password
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Semester Already Exists -->
+    <div class="modal fade" id="semesterAlreadyExistsModal" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create Semester</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    Semester Already Exists
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Semester successfully created -->
+    <div class="modal fade" id="semesterCreatedSuccessModal" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create Semester</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    Semester successfully created!
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="document.location.reload()" class="btn btn-secondary"
+                        data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Creating Semester -->
+    <div class="modal fade" id="creatingSemesterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-body">
+
+                    <div>Creating Semester...</div>
+
+                    <div class="lds-roller">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Classes -->
+    <div class="modal fade" id="loadingClassesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-body">
+
+                    <div>Loading Classes...</div>
+
+                    <div class="lds-roller">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Creating Semester Report -->
+    <div class="modal fade" id="creatingSemesterReportModal" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-body">
+
+                    <div>Creating Semester Report...</div>
+
+                    <div class="lds-roller">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Max Capacity -->
+    <div class="modal fade" id="max_capacityModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Change Max Capacity</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Max Capacity</span>
+                        </div>
+                        <input id="new_max_capacity" type="text" class="form-control" placeholder=""
+                            aria-label="Class Number" aria-describedby="basic-addon1">
+                    </div>
+
+                </div>
+                <div id="button-house" class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button onclick="createSemester()" data-dismiss="modal" type="button" class="btn btn-primary">Create
+                        Semester</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Semester From Catsweb -->
+    <div class="modal fade" id="catsweb_semesterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create Semester From Catsweb</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="new_semester_form" id="new_semester_form" novalidate
+                    action="/generate_semester_from_catsweb" method="POST">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="col-md-6 mb-3">
+                                <label for="validationCustom05">Semester</label>
+                                <select id="catsweb_new_semester_season" class="custom-select">
+                                    <option value="Spring">Spring</option>
+                                    <option value="Summer">Summer</option>
+                                    <option value="Fall">Fall</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="validationCustom01">Year</label>
+                                <input type="text" class="form-control" id="catsweb_new_semester_year"
+                                    name="catsweb_new_semester_year" placeholder="Year" required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter a valid year
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6 mb-3">
+                                <label for="validationCustomUsername">NetID</label>
+                                <div class="input-group">
+                                    <!-- <div class="input-group-prepend">
+                                                <span class="input-group-text" id="inputGroupPrepend">@</span>
+                                            </div> -->
+                                    <input type="text" class="form-control" id="netID" name="netID"
+                                        placeholder="NetID" aria-describedby="inputGroupPrepend" required>
+                                    <div class="invalid-feedback">
+                                        Please enter NetID
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="validationCustomUsername">Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="PID" required>
+                                    <div class="invalid-feedback">
+                                        Please enter password
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit">Submit form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="change_password_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Change Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="change_password_form" id="change_password_form" novalidate action="/change_password"
+                    method="POST">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Old Password</label>
+                                <input type="password" class="form-control" id="old_password" placeholder="Old Password"
+                                    required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter old password
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">New Password</label>
+                                <input type="password" class="form-control" id="new_password" placeholder="New Password"
+                                    required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter new password
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirm_password"
+                                    placeholder="Confirm Password" required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please confirm password
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit">Create Override</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Class Modal -->
+    <div class="modal fade" id="classModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create New Class</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Class Number</span>
+                        </div>
+                        <input id="new_class_class_number" type="text" class="form-control" placeholder="Eg: 3303, 4335"
+                            aria-label="Class Number" aria-describedby="basic-addon1">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Section</span>
+                        </div>
+                        <input id="new_class_section_number" type="text" class="form-control" placeholder=""
+                            aria-label="Section" aria-describedby="basic-addon1">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Max Capacity</span>
+                        </div>
+                        <input id="new_class_max_capacity" type="text" class="form-control" placeholder=""
+                            aria-label="Max Capacity" aria-describedby="basic-addon1">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button onclick="createClass(); " type="button" data-dismiss="modal" class="btn btn-primary">Add
+                        Class</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Override Modal -->
+    <div class="modal fade" id="overrideModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create New Override</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="new_override_form" id="new_override_form" novalidate action="/override" method="POST">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Student Name</label>
+                                <input type="text" class="form-control" id="new_override_student_name"
+                                    placeholder="Student Name" required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter student name
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">A0 Number</label>
+                                <input type="text" class="form-control" id="new_override_A_number"
+                                    placeholder="A0 Number" required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter student A0 number
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Net ID</label>
+                                <input type="text" class="form-control" id="new_override_netid" placeholder="NetID"
+                                    required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter student NetID
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Class Number</label>
+                                <select id="class_number_list" class="custom-select" onchange="changeFunc()">
+                                    <option value="0">Select One</option>
+                                </select>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Class Section</label>
+                                <select id="class_section_list" class="custom-select">
+                                </select required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter student class section
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Days to Use</label>
+                                <input type="text" class="form-control" id="num_days_to_use" placeholder="Days to Use"
+                                    required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter number of days to use
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit">Create Override</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-light navbar-expand-md">
+        <div class="container-fluid"><a onclick="document.location.reload(true)" class="navbar-brand"
+                href="#">Binder</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span
+                    class="sr-only">Toggle
+                    navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="nav navbar-nav text-left ml-auto">
+                    <li class="nav-item" role="presentation"></li>
+                    <li class="nav-item dropdown"><a class="dropdown-toggle nav-link" data-toggle="dropdown"
+                            aria-expanded="false" href="#">Create New&nbsp;</a>
+                        <div id="navbar-dropdown-menu" class="dropdown-menu" role="menu"><a class="dropdown-item"
+                                data-toggle="modal" data-target="#catsweb_semesterModal" role="presentation"
+                                href="#">Semester</a></div>
+                    </li>
+                    <li class="nav-item" role="presentation"></li>
+                    <li class="nav-item" role="presentation"></li>
+                    <li class="nav-item dropdown"><a class="dropdown-toggle nav-link" data-toggle="dropdown"
+                            aria-expanded="false" href="#">Hello {{ name }}&nbsp;</a>
+                        <div class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" role="presentation" data-toggle="modal"
+                                data-target="#change_password_modal" href="#">Change Password</a>
+                            <a class="dropdown-item" role="presentation" href="/logout">Logout</a></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <!-- Start of semester selection -->
+    <div id="main_container" class="container">
+        <div>
+            <div class="jumbotron">
+                <h1 class="text-center">Select Semester</h1>
+                <div class="text-left">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputGroupSelect01">Semester</label>
+                        </div>
+                        <select id="inputGroupSelect01" class="custom-select">
+                            <!-- <option value="Spring">Spring</option>
+                            <option value="Summer">Summer</option>
+                            <option value="Fall">Fall</option> -->
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputGroupSelect01">Year</label>
+                        </div>
+                        <select id="my_years" class="custom-select">
+                        </select>
+                    </div>
+                    <button onclick="getClassNumbers(true)" class="btn btn-primary" type="button">Go</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="lds-ring"><div></div><div></div><div></div><div></div></div> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap-notify.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/index.min.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Farmacy Meals</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sam.styles.min.css') }}">
+</head>
+
+<body>
+    <!-- <div class="login-clean">
+        <form method="post">
+            <h2 class="sr-only">Login Form</h2>
+            <div class="illustration"><i class="icon ion-android-person"></i></div>
+            <div class="form-group"><input class="form-control" type="email" name="email" placeholder="Email"></div>
+            <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password"></div>
+            <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div><a href="#" class="forgot">Forgot your email or password?</a></form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script> -->
+    <div class="login-clean">
+        <h1 class="sr-only">Sign In</h1>
+        <form action="" method="post" novalidate style="text-align: center;" class="form-group">
+            {{ form.hidden_tag() }}
+            <div class="illustration"><i class="icon ion-android-person"></i></div>
+            <p>
+                {% if error %}
+                <span class=error style="color: red;">{{ error }}</span>
+                {% endif %}
+            </p>
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(class_="form-group") }}<br>
+                {% for error in form.email.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(class_="form-group") }}<br>
+                {% for error in form.password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+
+            <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+            <p>{{ form.submit(class_="btn btn-primary btn-block") }}</p>
+
+            <a href="/facebook_login" style="font-size: 30px; margin-left: 15px; margin-right: 15px; "><i class="fa fa-facebook"></i></a>
+            <a href="/google_login" style="font-size: 30px; margin-left: 15px; margin-right: 15px; "><i class="fa fa-google"></i></a>
+
+            <p style="text-align: center; margin-top: 10px; "><a href="{{ url_for('register') }}">Click to Register!</a></p>
+        </form>
+        
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>SemesterReport</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="text-center"><img src="/Users/brentredmon/Documents/Work/Override Request Project/app/static/img/txst-primary.png" style="width: 250px; margin-top:10px"></div><br>
+    <h3 class="text-center">{{ semester }} {{ year }} Semester Report</h3>
+    <div class="container">
+        {% for i in range(classes|length) %}
+        <div class="jumbotron">
+            <h3>{{ department }} {{ classes[i].class_number }}.{{ classes[i].class_section }}</h3>
+            <p>Professor: {{ classes[i].professor }} </p>
+            <p>Enrolled Students: {{ classes[i].num_enrolled_students }}</p>
+            <p>Overrides Granted: {{ classes[i].overrides.all()|length }}</p>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>A0 Number</th>
+                            <th>NetID</th>
+                            <th>Date</th>
+                            <th>Creator</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for j in range(classes[i].overrides.all()|length) %}
+                        <tr>
+                            <td>{{ classes[i].overrides[j].student_name }}</td>
+                            <td>{{ classes[i].overrides[j].student_A_number }}</td>
+                            <td>{{ classes[i].overrides[j].student_netid }}</td>
+                            <td>{{ classes[i].overrides[j].date_created }}</td>
+                            <td>{{ classes[i].overrides[j].creator }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+<div id="card-body" class="card">
+
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+            {% for i in range(class_numbers|length) %}
+                <li onclick="fetchClasses('{{ class_numbers[i] }}')" class="nav-item"><a class="nav-link" id="{{ class_numbers[i] }}" data-toggle="tab" role="tab" aria-controls="item-1-{{ i }}" aria-selected="true" href="#item-1-{{ i }}">{{ class_numbers[i] }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card-body">
+        <div id="nav-tabContent" class="tab-content">
+            {% for i in range(class_numbers|length) %}
+                <div id="item-1-{{ i }}" class="tab-pane fade" role="tabpanel" aria-labelledby="{{ class_numbers[i] }}">
+                    <div class="jumbotron">
+                        <div id="{{ class_numbers[i] }}-container" class="container">
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

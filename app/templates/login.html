@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>SelectClass (copy)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.styles.min.css') }}">
+</head>
+
+<body>
+    <div id="login-one" class="login-one">
+        <form class="login-one-form" action="" method="post" novalidate style="text-align: center;" class="form-group">
+            <div class="login-one-ico"><i class="fa fa-unlock-alt" id="lockico"></i></div>
+            {{ form.hidden_tag() }}
+            <p>
+                {% if error %}
+                <span class=error style="color: red;">{{ error }}</span>
+                {% endif %}
+            </p>
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(class_="form-group") }}<br>
+                {% for error in form.email.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(class_="form-group") }}<br>
+                {% for error in form.password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+
+            <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+            <p>{{ form.submit(class_="btn btn-primary btn-block") }}</p>
+
+            </p>
+        </form>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
