@@ -18,6 +18,67 @@
 
 <body>
 
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="change_password_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Change Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="change_password_form" id="change_password_form" novalidate action="/change_password"
+                    method="POST">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Old Password</label>
+                                <input type="password" class="form-control" id="old_password" placeholder="Old Password"
+                                    required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter old password
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">New Password</label>
+                                <input type="password" class="form-control" id="new_password" placeholder="New Password"
+                                    required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter new password
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirm_password"
+                                    placeholder="Confirm Password" required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please confirm password
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit">Change Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- New User Modal -->
     <div class="modal fade" id="newAdminModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -71,7 +132,8 @@
                         <div class="form-row">
                             <div class="col-md-6 mb-3">
                                 <label for="validationCustom03">Department</label>
-                                <select id="new_admin_department" class="custom-select" name="department" id="new_admin_department">
+                                <select id="new_admin_department" class="custom-select" name="department"
+                                    id="new_admin_department">
                                     {% for department in departments %}
                                     <option value="{{ department }}">{{ department }}</option>
                                     {% endfor %}
@@ -261,8 +323,8 @@
                     <li class="nav-item" role="presentation"></li>
                     <li class="nav-item dropdown"><a class="dropdown-toggle nav-link" data-toggle="dropdown"
                             aria-expanded="false" href="#">Hello {{ name }}&nbsp;</a>
-                        <div class="dropdown-menu" role="menu"><a class="dropdown-item" role="presentation"
-                                href="/dashboard">My Dashboard</a><a class="dropdown-item" role="presentation"
+                        <div class="dropdown-menu" role="menu"><a class="dropdown-item" role="presentation" data-toggle="modal"
+                            data-target="#change_password_modal" href="#">Change Password</a><a class="dropdown-item" role="presentation"
                                 href="/logout">Logout</a></div>
                     </li>
                 </ul>

@@ -256,3 +256,67 @@ function changeUserAuthentication() {
         });
     }, false);
 })();
+
+(function () {
+    'use strict';
+    window.addEventListener('load', function () {
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.getElementsByClassName('change_password_form');
+        // Loop over them and prevent submission
+        var validation = Array.prototype.filter.call(forms, function (form) {
+            form.addEventListener('submit', function (event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    $("#change_password_modal").modal('hide')
+                    event.preventDefault()
+                    var $form = $("#change_password_form")
+                    var url = $form.attr('action')
+
+                    var payload = {
+                        "old_password": $("#old_password").val(),
+                        "new_password": $("#new_password").val(),
+                        "confirm_password": $("#confirm_password").val()
+                    }
+
+                    $.post(url, payload, function (response) {
+
+                        if (response["status_code"] == 400) {
+                            $.notify({
+                                message: response["message"]
+                            }, {
+                                    type: 'success',
+                                    placement: {
+                                        from: "bottom",
+                                        align: "center"
+                                    }
+                                });
+                        } else if (response["status_code"] == 401) {
+                            $.notify({
+                                message: response["message"]
+                            }, {
+                                    type: 'danger',
+                                    placement: {
+                                        from: "bottom",
+                                        align: "center"
+                                    }
+                                });
+                        } else if (response["status_code"] == 402) {
+                            $.notify({
+                                message: response["message"]
+                            }, {
+                                    type: 'danger',
+                                    placement: {
+                                        from: "bottom",
+                                        align: "center"
+                                    }
+                                });
+                        }
+                    });
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
