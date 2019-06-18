@@ -32,6 +32,9 @@ class UserModel(UserMixin, db.Model):
     # What department does the Student Worker work for?
     department = db.Column(db.String(64), index=True, unique=False)
 
+    # What classes does this department control
+    class_jurisdiction = db.Column(db.String(256), index=False, unique=False)
+
     # We do not store passwords directly, only the hash of a password
     password_hash = db.Column(db.String(128))
 

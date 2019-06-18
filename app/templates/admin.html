@@ -130,19 +130,30 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="validationCustom03">Department</label>
                                 <select id="new_admin_department" class="custom-select" name="department"
                                     id="new_admin_department">
                                     {% for department in departments %}
-                                    <option value="{{ department }}">{{ department }}</option>
+                                    <option value="{{ department['catsweb_val'] }}">{{ department['screen_name'] }}</option>
                                     {% endfor %}
                                 </select>
                                 <div class="invalid-feedback">
                                     Please provide a department.
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom03">Class Jurisdiction</label>
+                                <select id="new_admin_class_jurisdiction" class="custom-select" name="department" id="new_admin_class_jurisdiction" multiple>
+                                    {% for department in departments %}
+                                    <option value="{{ department['catsweb_val'] }}">{{ department['screen_name'] }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please provide a department.
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label for="validationCustom05">Authorization Level</label>
                                 <select id="new_admin_authorization" class="custom-select" name="authorization_level">
                                     <option value="1">Student Worker</option>
@@ -323,9 +334,9 @@
                     <li class="nav-item" role="presentation"></li>
                     <li class="nav-item dropdown"><a class="dropdown-toggle nav-link" data-toggle="dropdown"
                             aria-expanded="false" href="#">Hello {{ name }}&nbsp;</a>
-                        <div class="dropdown-menu" role="menu"><a class="dropdown-item" role="presentation" data-toggle="modal"
-                            data-target="#change_password_modal" href="#">Change Password</a><a class="dropdown-item" role="presentation"
-                                href="/logout">Logout</a></div>
+                        <div class="dropdown-menu" role="menu"><a class="dropdown-item" role="presentation"
+                                data-toggle="modal" data-target="#change_password_modal" href="#">Change Password</a><a
+                                class="dropdown-item" role="presentation" href="/logout">Logout</a></div>
                     </li>
                 </ul>
             </div>
@@ -346,6 +357,8 @@
                     </th>
                     <th class="th-sm">Department
                     </th>
+                    <th class="th-sm">Class Jurisdiction
+                    </th>
                     <th class="th-sm">Authentication Level
                     </th>
                 </tr>
@@ -357,6 +370,7 @@
                     <td>{{ user.lastname }}</td>
                     <td>{{ user.id }}</td>
                     <td>{{ user.department }}</td>
+                    <td>{{ user.class_jurisdiction }}</td>
                     {% if user.authentication_level == 1 %}
                     <td>Student Worker</td>
                     {% elif user.authentication_level == 2 %}
@@ -376,6 +390,8 @@
                     <th>NetID
                     </th>
                     <th>Department
+                    </th>
+                    <th>Class Jurisdiction
                     </th>
                     <th>Authentication Level
                     </th>

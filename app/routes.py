@@ -125,6 +125,7 @@ class CreateNewUser(Resource):
         parser.add_argument('netID', type=str)
         parser.add_argument('department', type=str)
         parser.add_argument('authorization_level', type=int)
+        parser.add_argument('class_jurisdiction', type=str)
         
         self.args = parser.parse_args()
     
@@ -137,7 +138,8 @@ class CreateNewUser(Resource):
                     lastname = self.args["lastname"], 
                     email = self.args["netID"] + '@txstate.edu', 
                     department = self.args["department"],
-                    authentication_level = self.args["authorization_level"]
+                    authentication_level = self.args["authorization_level"], 
+                    class_jurisdiction = self.args["class_jurisdiction"]
                 )
 
                 new_user.set_password('1234')
@@ -602,9 +604,6 @@ class GenerateSemesterFromCatsweb(Resource):
         
         user = UserModel.query.filter_by(id=current_user.id).first()
 
-        print("\n\nCurrent User Department: {}".format(current_user.department))
-        print("Queried User Department: {} \n\n".format(user.department))
-
         if current_user.department != user.department:
             logout_user(current_user)
 
@@ -619,8 +618,6 @@ class GenerateSemesterFromCatsweb(Resource):
             term = self.args["year"] + '50'
         else:
             term = str(int(self.args["year"]) + 1) + '10'
-
-        print("\n\n\n", term, "\n\n\n")
         
         with requests.Session() as c:
 
@@ -673,7 +670,11 @@ class GenerateSemesterFromCatsweb(Resource):
                 return {"status_code": 402}
 
             # Make a request to this link to get a list of all the classes offered at Texas State
-            classes_url = "https://ssb.txstate.edu/prod/bwskfcls.P_GetCrse_Advanced?rsts=dummy&crn=dummy&term_in={}&sel_subj=dummy&sel_day=dummy&sel_schd=dummy&sel_insm=dummy&sel_camp=dummy&sel_levl=dummy&sel_sess=dummy&sel_instr=dummy&sel_ptrm=dummy&sel_attr=dummy&sel_subj={}&sel_crse=&sel_title=&sel_schd=%25&sel_insm=%25&sel_from_cred=&sel_to_cred=&sel_camp=%25&sel_levl=%25&sel_ptrm=%25&sel_instr=%25&sel_sess=%25&sel_attr=%25&begin_hh=0&begin_mi=0&begin_ap=a&end_hh=0&end_mi=0&end_ap=a&SUB_BTN=Section+Search&path=1".format(term, user.department)
+            class_jurisdiction_query_string = ""
+            for subject in current_user.class_jurisdiction.split(","):
+                class_jurisdiction_query_string = class_jurisdiction_query_string + "&sel_subj={}".format(subject)
+            print("Jurisdiction! \n\n + {}".format(class_jurisdiction_query_string))
+            classes_url = "https://ssb.txstate.edu/prod/bwskfcls.P_GetCrse_Advanced?rsts=dummy&crn=dummy&term_in={}&sel_subj=dummy&sel_day=dummy&sel_schd=dummy&sel_insm=dummy&sel_camp=dummy&sel_levl=dummy&sel_sess=dummy&sel_instr=dummy&sel_ptrm=dummy&sel_attr=dummy{}&sel_crse=&sel_title=&sel_schd=%25&sel_insm=%25&sel_from_cred=&sel_to_cred=&sel_camp=%25&sel_levl=%25&sel_ptrm=%25&sel_instr=%25&sel_sess=%25&sel_attr=%25&begin_hh=0&begin_mi=0&begin_ap=a&end_hh=0&end_mi=0&end_ap=a&SUB_BTN=Section+Search&path=1".format(term, class_jurisdiction_query_string)
             response = c.get(classes_url)
 
             # Parse response into BeautifulSoup
@@ -694,7 +695,7 @@ class GenerateSemesterFromCatsweb(Resource):
                     index = index + 1
                     continue
                 if index is 3:
-                    individual_class["department"] = td.text.strip()
+                    individual_class["department"] = td.text.strip().replace(" ", "+")
                     index = index + 1
                     continue
                 if index is 4:
@@ -770,13 +771,13 @@ class GenerateSemesterFromCatsweb(Resource):
 
         # Make the classes and add them to the semester
         for scraped_class in all_classes:
-            if scraped_class["department"] == current_user.department:
+            if scraped_class["department"] in current_user.class_jurisdiction.split(","):
                 # Make the class!
                 try:
 
                     # Create the new class
                     new_class = ClassModel(
-                        id = current_user.department + "-" + scraped_class["class_number"]  + "-" + scraped_class["class_section"] + "-" + str(self.args["semester"] + "-" + str(self.args["year"])), 
+                        id = scraped_class["department"].replace(" ", "+") + "-" + scraped_class["class_number"]  + "-" + scraped_class["class_section"] + "-" + str(self.args["semester"] + "-" + str(self.args["year"])), 
                         class_number = scraped_class["class_number"], 
                         class_section = scraped_class["class_section"], 
                         department = current_user.department,

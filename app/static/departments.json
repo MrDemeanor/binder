@@ -1,6 +1,16 @@
 {
     "departments": [
-        "MGT", 
-        "ACC"
+        {
+            "screen_name": "Management", 
+            "catsweb_val": "MGT"
+        }, 
+        {
+            "screen_name": "Accounting", 
+            "catsweb_val": "ACC"
+        }, 
+        {
+            "screen_name": "Business Administration", 
+            "catsweb_val": "B+A"
+        }
     ]
 }

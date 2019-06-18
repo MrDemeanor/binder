@@ -6,7 +6,6 @@ new_user = UserModel(
     firstname = 'Brent', 
     lastname = 'Redmon', 
     email = 'btr26@txstate.edu', 
-    department = "",
     authentication_level = 3
 )
 
