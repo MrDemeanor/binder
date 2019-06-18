@@ -56,47 +56,48 @@
                 </div>
 
                 <!-- Override Table -->
-                <table id="overrideTable" class="table table-striped table-bordered" cellspacing="0"
-                    width="100%">
-                    <thead>
-                        <tr>
-                            <th class="th-sm">Student Name
-                            </th>
-                            <th class="th-sm">A0 Number
-                            </th>
-                            <th class="th-sm">NetID
-                            </th>
-                            <th class="th-sm">Date
-                            </th>
-                            <th class="th-sm">Creator
-                            </th>
-                            <th class="th-sm">Registered
-                            </th>
-                            <th class="th-sm">Delete
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="override-table-body">
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th>Student Name
-                            </th>
-                            <th>A0 Number
-                            </th>
-                            <th>NetID
-                            </th>
-                            <th>Date
-                            </th>
-                            <th>Creator
-                            </th>
-                            <th>Registered
-                            </th>
-                            <th>Delete
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div class="container">
+                    <table id="overrideTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th class="th-sm">Student Name
+                                </th>
+                                <th class="th-sm">A0 Number
+                                </th>
+                                <th class="th-sm">NetID
+                                </th>
+                                <th class="th-sm">Date
+                                </th>
+                                <th class="th-sm">Creator
+                                </th>
+                                <th class="th-sm">Registered
+                                </th>
+                                <th class="th-sm">Delete
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="override-table-body">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Student Name
+                                </th>
+                                <th>A0 Number
+                                </th>
+                                <th>NetID
+                                </th>
+                                <th>Date
+                                </th>
+                                <th>Creator
+                                </th>
+                                <th>Registered
+                                </th>
+                                <th>Delete
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
 
             </div>
         </div>
@@ -151,48 +152,52 @@
     <div id="generated_individual_class_modal" class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog"
         aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
-            <div id="generated_individual_class_modal_body" class="modal-content">
+            
+                <div id="generated_individual_class_modal_body" class="modal-content">
 
-                <!-- Override Table -->
-                <table id="generated_individual_classTable" class="table table-striped table-bordered table-sm"
-                    cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            <th class="th-sm">Section
-                            </th>
-                            <th class="th-sm">Days
-                            </th>
-                            <th class="th-sm">Time
-                            </th>
-                            <th class="th-sm">Num Enrollment
-                            </th>
-                            <th class="th-sm">Max Capacity
-                            </th>
-                            <th class="th-sm">Percentage Filled
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="generated_individual_class-table-body">
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th>Section
-                            </th>
-                            <th>Days
-                            </th>
-                            <th>Time
-                            </th>
-                            <th>Num Enrollment
-                            </th>
-                            <th>Max Capacity
-                            </th>
-                            <th>Percentage Filled
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
+                    <!-- Override Table -->
 
-            </div>
+                    <table id="generated_individual_classTable" class="table table-striped table-bordered table-sm"
+                        cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th class="th-sm">Section
+                                </th>
+                                <th class="th-sm">Days
+                                </th>
+                                <th class="th-sm">Time
+                                </th>
+                                <th class="th-sm">Num Enrollment
+                                </th>
+                                <th class="th-sm">Max Capacity
+                                </th>
+                                <th class="th-sm">Percentage Filled
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="generated_individual_class-table-body">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Section
+                                </th>
+                                <th>Days
+                                </th>
+                                <th>Time
+                                </th>
+                                <th>Num Enrollment
+                                </th>
+                                <th>Max Capacity
+                                </th>
+                                <th>Percentage Filled
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+
+                </div>
+            
         </div>
     </div>
 
@@ -423,8 +428,8 @@
                                     <!-- <div class="input-group-prepend">
                                                 <span class="input-group-text" id="inputGroupPrepend">@</span>
                                             </div> -->
-                                    <input type="text" class="form-control" id="netID" name="netID"
-                                        placeholder="NetID" aria-describedby="inputGroupPrepend" required>
+                                    <input type="text" class="form-control" id="netID" name="netID" placeholder="NetID"
+                                        aria-describedby="inputGroupPrepend" required>
                                     <div class="invalid-feedback">
                                         Please enter NetID
                                     </div>

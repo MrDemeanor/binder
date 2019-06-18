@@ -229,12 +229,13 @@ class GetSpecificClass(Resource):
         parser.add_argument('class_section', type=str)
         parser.add_argument('semester', type=str)
         parser.add_argument('year', type=str)
+        parser.add_argument('subject', type=str)
         
         self.args = parser.parse_args()
     
     def get(self): 
         specific_class = ClassModel.query.filter_by(
-            id=current_user.department + "-" + self.args["class_number"] + "-" + self.args["class_section"] + "-" + self.args["semester"] + "-" + self.args["year"]
+            id=self.args["subject"] + "-" + self.args["class_number"] + "-" + self.args["class_section"] + "-" + self.args["semester"] + "-" + self.args["year"]
         )
 
         return jsonify(specific_class = class_schema_many.dump(specific_class).data)
@@ -364,8 +365,10 @@ class FetchClasses(Resource):
 
             for my_class in all_classes:
                 print("\n", my_class, "\n")
+            
+            subject = all_classes[0]["subject"]
 
-            page = render_template('class_template.html', num_rows=num_rows, all_classes=all_classes, remainder=remainder, class_number=request.args["class_number"])
+            page = render_template('class_template.html', num_rows=num_rows, all_classes=all_classes, remainder=remainder, class_number=request.args["class_number"], subject=subject)
 
             return { "page": page, "class_number": request.args["class_number"] }
         except:
@@ -526,11 +529,12 @@ class GetOverridesForSpecificClass(Resource):
         parser.add_argument('class_section', type=str)
         parser.add_argument('semester', type=str)
         parser.add_argument('year', type=str)
+        parser.add_argument('subject', type=str)
 
         self.args = parser.parse_args()
     
     def get(self):
-        id = current_user.department + "-" + self.args["class_number"] + "-" + self.args["class_section"] + "-" + self.args["semester"] + "-" + self.args["year"]
+        id = self.args["subject"] + "-" + self.args["class_number"] + "-" + self.args["class_section"] + "-" + self.args["semester"] + "-" + self.args["year"]
         print("\n\n", id, "\n\n")
         specific_class = ClassModel.query.filter_by(
             id=id
@@ -791,7 +795,8 @@ class GenerateSemesterFromCatsweb(Resource):
                         percentage_filled = int(scraped_class["act"]) / 300,
                         year = self.args["year"], 
                         season = self.args["semester"],
-                        semester=new_semester
+                        semester=new_semester, 
+                        subject = scraped_class["department"].replace(" ", "+")
                     )
                     db.session.add(new_class)
 
@@ -845,7 +850,7 @@ class Override(Resource):
     # Create a new overrides
     def post(self):
         try:
-            university_class = ClassModel.query.filter_by(id = current_user.department + "-" + str(self.args["class_number"])  + "-" + str(self.args["class_section"]) + "-" + str(self.args["semester"]) + "-" + str(self.args["year"])).first()
+            university_class = ClassModel.query.filter_by(year = self.args["year"], class_number = self.args["class_number"], class_section = self.args["class_section"], season = self.args["semester"], department = current_user.department).first()
             if university_class.percentage_filled >= 1:
                 return { "status_code": 401, "message": str(self.args["class_number"]) + "." + str(self.args["class_section"]) + " filled"}
             university_class.potentially_enrolled_students = university_class.potentially_enrolled_students + 1
@@ -955,10 +960,14 @@ class ChangeRegistrationStatus(Resource):
         try:
             override = OverrideModel.query.filter_by(id = self.args["override_id"]).first()
             override.registration_status = not override.registration_status
-            override.university_class.potentially_enrolled_students = override.university_class.potentially_enrolled_students - 1
+
+            if override.registration_status:
+                override.university_class.potentially_enrolled_students = override.university_class.potentially_enrolled_students - 1
+            else:
+                override.university_class.potentially_enrolled_students = override.university_class.potentially_enrolled_students + 1
 
             db.session.commit()
-            return jsonify(status=override.registration_status)
+            return jsonify(status=override.registration_status, potentially_enrolled = override.university_class.potentially_enrolled_students)
         except:
             return abort(502, 'Override was not updated')
 

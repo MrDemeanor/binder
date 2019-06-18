@@ -8,7 +8,7 @@
             <!-- If we are in the last row -->
             {% if i == num_rows - 1 %}
                 {% for j in range(remainder) %}
-                <div class="col-3 hvr-float" style="cursor: pointer; " onclick="getSpecificClass('{{ all_classes[(i * 4) + j]['class_number'] }}', '{{ all_classes[(i * 4) + j]['class_section'] }}')" data-toggle="modal" data-target="#individual_class_modal">
+                <div class="col-3 hvr-float" style="cursor: pointer; " onclick="getSpecificClass('{{ all_classes[(i * 4) + j]['subject'] }}', '{{ all_classes[(i * 4) + j]['class_number'] }}', '{{ all_classes[(i * 4) + j]['class_section'] }}')" data-toggle="modal" data-target="#individual_class_modal">
                         <div class="card text-white bg-secondary mb-3">
                             {% if all_classes[(i * 4) + j]["percentage_filled"] >= 1 %}
                                 <div style="background-color: red !important" class="card-header">FULL</div>
@@ -16,7 +16,7 @@
                                 <div class="card-header"></div>
                             {% endif %}
                             <div class="card-body">
-                                <h5 class="text-center">{{ all_classes[(i * 4) + j]["department"] }} {{ all_classes[(i * 4) + j]["class_number"] }}.{{ all_classes[(i * 4) + j]["class_section"] }}</h5>
+                                <h5 class="text-center">{{ all_classes[(i * 4) + j]["subject"] }} {{ all_classes[(i * 4) + j]["class_number"] }}.{{ all_classes[(i * 4) + j]["class_section"] }}</h5>
                                 <p class="text-center">{{ all_classes[(i * 4) + j]["professor"] }}</p>
                             </div>
                         </div>
@@ -26,7 +26,7 @@
             <!-- If we are NOT in the last row -->
             {% else %}
                 {% for j in range(4) %}
-                <div class="col-3 hvr-float" style="cursor: pointer; " onclick="getSpecificClass('{{ all_classes[(i * 4) + j]['class_number'] }}', '{{ all_classes[(i * 4) + j]['class_section'] }}')" data-toggle="modal" data-target="#individual_class_modal">
+                <div class="col-3 hvr-float" style="cursor: pointer; " onclick="getSpecificClass('{{ all_classes[(i * 4) + j]['subject'] }}', '{{ all_classes[(i * 4) + j]['class_number'] }}', '{{ all_classes[(i * 4) + j]['class_section'] }}')" data-toggle="modal" data-target="#individual_class_modal">
                         <div class="card text-white bg-secondary mb-3">
                             {% if all_classes[(i * 4) + j]["percentage_filled"] >= 1 %}
                                 <div style="background-color: red !important" class="card-header">FULL</div>
@@ -34,7 +34,7 @@
                                 <div class="card-header"></div>
                             {% endif %}
                             <div class="card-body">
-                                <h5 class="text-center">{{ all_classes[(i * 4) + j]["department"] }} {{ all_classes[(i * 4) + j]["class_number"] }}.{{ all_classes[(i * 4) + j]["class_section"] }}</h5>
+                                <h5 class="text-center">{{ all_classes[(i * 4) + j]["subject"] }} {{ all_classes[(i * 4) + j]["class_number"] }}.{{ all_classes[(i * 4) + j]["class_section"] }}</h5>
                                 <p class="text-center">{{ all_classes[(i * 4) + j]["professor"] }}</p>
                             </div>
                         </div>

@@ -14,7 +14,7 @@
     <div class="container">
         {% for i in range(classes|length) %}
         <div class="jumbotron">
-            <h3>{{ department }} {{ classes[i].class_number }}.{{ classes[i].class_section }}</h3>
+            <h3>{{ classes[i].subject }} {{ classes[i].class_number }}.{{ classes[i].class_section }}</h3>
             <p>Professor: {{ classes[i].professor }} </p>
             <p>Enrolled Students: {{ classes[i].num_enrolled_students }}</p>
             <p>Overrides Granted: {{ classes[i].overrides.all()|length }}</p>

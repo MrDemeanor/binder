@@ -107,6 +107,9 @@ class ClassModel(db.Model):
     # What department does this class pertain to?
     department = db.Column(db.String(64), index=True, unique=False)
 
+    # What is the name of the subject
+    subject = db.Column(db.String(64), index=True, unique=False)
+
     # Professor teaching the class
     professor = db.Column(db.String(64), index=True, unique=False)
 
