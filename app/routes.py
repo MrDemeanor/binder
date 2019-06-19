@@ -1,3 +1,5 @@
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from app import app, db
 from flask import session, Session
 from flask_restful import Resource, Api, reqparse
@@ -20,12 +22,18 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 import base64
+import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from passgen import passgen
 
 api = Api(app)
+
 
 def get_image_file_as_base64_data():
     with open('/Users/brentredmon/Documents/Work/Override Request Project/app/static/img/txst-primary.png', 'r') as image_file:
         return base64.b64encode(image_file.read())
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -33,36 +41,43 @@ def get_image_file_as_base64_data():
 def index():
     """
         Check the level of authentication of the current user. If the current user has Sys Admin
-        privileges, render the sys_admin page. Otherwise, load the regular index page. 
+        privileges, render the sys_admin page. Otherwise, load the regular index page.
     """
-    
+
     if current_user.authentication_level < 3:
-        return render_template('index.html', name = current_user.firstname)
+        return render_template('index.html', name=current_user.firstname)
     else:
-        departments = json.load(open("app/static/departments.json"))["departments"]
+        departments = json.load(
+            open("app/static/departments.json"))["departments"]
         users = UserModel.query.all()
-        return render_template('admin.html', name = current_user.firstname, departments = departments, users = users)
-    
+        return render_template('admin.html', name=current_user.firstname, departments=departments, users=users)
+
+
 @app.route('/create_semester_report', methods=['GET'])
 @login_required
 def create_semester_report():
     semester = request.args.get('semester')
     year = request.args.get('year')
 
-    this_semester = SemesterModel.query.filter_by(id = current_user.department + "-" + semester + "-" + str(year)).first()
-    rendered = render_template('semester_report.html', classes = this_semester.classes.all(), department=current_user.department, semester=semester, year=year)
+    this_semester = SemesterModel.query.filter_by(
+        id=current_user.department + "-" + semester + "-" + str(year)).first()
+    rendered = render_template('semester_report.html', classes=this_semester.classes.all(
+    ), department=current_user.department, semester=semester, year=year)
     pdf = pdfkit.from_string(rendered, False)
-    
+
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'inline; filename=' + current_user.department + '-' + semester + '-' + year + '.pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=' + \
+        current_user.department + '-' + semester + '-' + year + '.pdf'
 
     return response
+
 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -85,6 +100,7 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form, error=error)
 
+
 """
     Route to be used by a level 2 SysAdmin for creating accounts
 """
@@ -95,15 +111,16 @@ def register():
         error = None
         form = RegistrationForm()
         if form.validate_on_submit():
-            user = UserModel(first_name=form.first_name.data, email=form.email.data)
+            user = UserModel(first_name=form.first_name.data,
+                             email=form.email.data)
             user.username = user.email
             if len(form.password.data) < 8:
-                error='Make sure your password is at least 8 letters'
+                error = 'Make sure your password is at least 8 letters'
                 flash('Invalid password.', 'error')
-            elif re.search('[0-9]',form.password.data) is None:
-                error='Make sure your password has a number in it'
-            elif re.search('[A-Z]',form.password.data) is None: 
-                error='Make sure your password has a capital letter in it'
+            elif re.search('[0-9]', form.password.data) is None:
+                error = 'Make sure your password has a number in it'
+            elif re.search('[A-Z]', form.password.data) is None:
+                error = 'Make sure your password has a capital letter in it'
             else:
                 user.set_password(form.password.data)
                 db.session.add(user)
@@ -111,11 +128,56 @@ def register():
                 flash('Congratulations, you are now a registered user!')
                 return redirect(url_for('login'))
         flash('Invalid password.', 'error')
-            #return redirect(url_for('register'))
+            # return redirect(url_for('register'))
         return render_template('register.html', title='Register', form=form, error=error)
     else:
         return render_template('403.html', title='Forbidden')
 
+def send_email(receiver_email, receiver_name, password):
+
+    sender_email = ""
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Welcome to Binder!"
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    # Create the plain-text and HTML version of your message
+    text = """\
+    Hi, {},
+    Thank you for joining Binder! Below is your temporary password to log in. Once logged in, please change your password by selecting the 'Change Password' option in the top right hand corner.
+    Temporary Password: {}
+    Best, 
+    - The Binder Team
+    """.format(receiver_name, password)
+
+    html = """\
+    <html>
+    <body>
+        <p>Hi, {}<br><br>
+        Thank you for joining Binder! Below is your temporary password to log in. Once logged in, please change your password by selecting the 'Change Password' option in the top right hand corner. <br><br>
+        Temporary Password: <strong>{}</strong><br><br>
+        Best, <br>
+        - The Binder Team
+        </p>
+    </body>
+    </html>
+    """.format(receiver_name, password)
+
+    # Turn these into plain/html MIMEText objects
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+
+    # Add HTML/plain-text parts to MIMEMultipart message
+    # The email client will try to render the last part first
+    message.attach(part1)
+    message.attach(part2)
+
+    # Create secure connection with server and send email
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
 class CreateNewUser(Resource):
     def __init__(self):
         parser = reqparse.RequestParser()
@@ -126,28 +188,33 @@ class CreateNewUser(Resource):
         parser.add_argument('department', type=str)
         parser.add_argument('authorization_level', type=int)
         parser.add_argument('class_jurisdiction', type=str)
-        
+
         self.args = parser.parse_args()
-    
+
     def post(self):
         if current_user.authentication_level is 3:
             try:
                 new_user = UserModel(
-                    id = self.args["netID"], 
-                    firstname = self.args["firstname"], 
-                    lastname = self.args["lastname"], 
-                    email = self.args["netID"] + '@txstate.edu', 
-                    department = self.args["department"],
-                    authentication_level = self.args["authorization_level"], 
-                    class_jurisdiction = self.args["class_jurisdiction"]
+                    id=self.args["netID"],
+                    firstname=self.args["firstname"],
+                    lastname=self.args["lastname"],
+                    email=self.args["netID"] + '@txstate.edu',
+                    department=self.args["department"],
+                    authentication_level=self.args["authorization_level"],
+                    class_jurisdiction=self.args["class_jurisdiction"]
                 )
 
-                new_user.set_password('1234')
+                new_password = passgen(length=12, punctuation=False, digits=True, letters=True, case='both')
+
+                new_user.set_password(new_password)
                 db.session.add(new_user)
                 db.session.commit()
-                
-                return { "status_code": 400, "message": "User " + self.args["netID"] + " successfully created! Please reload the page. " }
-            except: 
+
+                send_email(self.args["netID"] + '@txstate.edu', self.args["firstname"], new_password)
+
+                return {"status_code": 400, "message": "User " + self.args["netID"] + " successfully created! Please reload the page. "}
+            except Exception as e: 
+                print(e)
                 return { "status_code": 401, "message": "Error!"}
         else:
             return { "status_code": 402, "message": "You do not have the proper credentials to create a user" }

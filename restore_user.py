@@ -2,10 +2,10 @@ from app import db
 from app.models import UserModel, SemesterModel, ClassModel, OverrideModel
 
 new_user = UserModel(
-    id = 'btr26', 
-    firstname = 'Brent', 
-    lastname = 'Redmon', 
-    email = 'btr26@txstate.edu', 
+    id = 'mw13', 
+    firstname = 'Max', 
+    lastname = 'Wittorp', 
+    email = 'mw13@txstate.edu', 
     authentication_level = 3
 )
 
