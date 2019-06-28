@@ -11,10 +11,11 @@ Flask-Social
 Flask-Security
 gunicorn
 Flask-Dance
-stripe
 flask_bcrypt
 schedule
 pdfkit
 requests
 bs4
 uwsgi
+passgen
+flask_prometheus

@@ -1,6 +1,0 @@
-/venv
-/migrations
-/__pycache__
-/.vscode
-*.db
-restore_user.py

@@ -11,6 +11,9 @@ import json
 
 @app.shell_context_processor
 def make_shell_context():
+    """
+        Allows for user to query and manipulate database in an interactive terminal session. 
+    """
     return {    'db': db, 
                 'UserModel': UserModel, 
                 'SemesterModel': SemesterModel, 
@@ -22,5 +25,4 @@ def make_shell_context():
     }
 
 if __name__ == '__main__':
-
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', debug=True)

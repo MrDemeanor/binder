@@ -1,20 +1,15 @@
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app import app, db
-from flask import session, Session
+from flask import session, Session, jsonify, abort, render_template, flash, redirect, url_for, request, make_response
 from flask_restful import Resource, Api, reqparse
 from app.models import UserModel, SemesterModel, ClassModel, OverrideModel
-from flask import jsonify, abort
 from sqlalchemy.exc import DatabaseError
 from app.serializers import user_schema, user_schema_many, semester_schema, semester_schema_many, class_schema, class_schema_many, override_schema, override_schema_many
 import pdfkit
-from flask import render_template, flash, redirect, url_for, request, make_response
-from app import app
 from app.forms import LoginForm
 from flask_login import current_user, login_user, logout_user, login_required
-from flask import request
 from werkzeug.urls import url_parse
-from app import db
 import time
 import json
 from math import ceil
@@ -23,17 +18,17 @@ import requests
 from bs4 import BeautifulSoup
 import base64
 import smtplib, ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from passgen import passgen
 
+# Creates an API instance for flask restful
 api = Api(app)
 
-
 def get_image_file_as_base64_data():
-    with open('/Users/brentredmon/Documents/Work/Override Request Project/app/static/img/txst-primary.png', 'r') as image_file:
+    """
+        Returns image as base 64 encoded data to put in semester report PDF file
+    """
+    with open('app/static/img/txst-primary.png', 'r') as image_file:
         return base64.b64encode(image_file.read())
-
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -43,44 +38,51 @@ def index():
         Check the level of authentication of the current user. If the current user has Sys Admin
         privileges, render the sys_admin page. Otherwise, load the regular index page.
     """
-
     if current_user.authentication_level < 3:
         return render_template('index.html', name=current_user.firstname)
     else:
-        departments = json.load(
-            open("app/static/departments.json"))["departments"]
+        departments = json.load(open("app/static/departments.json"))["departments"]
         users = UserModel.query.all()
         return render_template('admin.html', name=current_user.firstname, departments=departments, users=users)
-
 
 @app.route('/create_semester_report', methods=['GET'])
 @login_required
 def create_semester_report():
+    """
+        Makes a PDF document with each class in the current semester and lists every override for each class
+    """
+
+    # Get the semester and year from http arguments
     semester = request.args.get('semester')
     year = request.args.get('year')
 
-    this_semester = SemesterModel.query.filter_by(
-        id=current_user.department + "-" + semester + "-" + str(year)).first()
-    rendered = render_template('semester_report.html', classes=this_semester.classes.all(
-    ), department=current_user.department, semester=semester, year=year)
+    # Query for the current semester
+    this_semester = SemesterModel.query.filter_by(id=current_user.department + "-" + semester + "-" + str(year)).first()
+    rendered = render_template('semester_report.html', classes=this_semester.classes.all(), department=current_user.department, semester=semester, year=year)
     pdf = pdfkit.from_string(rendered, False)
 
+    # Tell the browser what to expect as a response (in this case, a PDF document)
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'inline; filename=' + \
-        current_user.department + '-' + semester + '-' + year + '.pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=' + current_user.department + '-' + semester + '-' + year + '.pdf'
 
     return response
 
 
 @app.route('/logout')
 def logout():
+    """
+        Logout current user
+    """
     logout_user()
     return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+        Logs in user with server side form validation
+    """
     error = None
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -100,48 +102,22 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form, error=error)
 
-
-"""
-    Route to be used by a level 2 SysAdmin for creating accounts
-"""
-@app.route('/register', methods=['GET', 'POST'])
-@login_required
-def register():
-    if current_user.authentication_level is 2:
-        error = None
-        form = RegistrationForm()
-        if form.validate_on_submit():
-            user = UserModel(first_name=form.first_name.data,
-                             email=form.email.data)
-            user.username = user.email
-            if len(form.password.data) < 8:
-                error = 'Make sure your password is at least 8 letters'
-                flash('Invalid password.', 'error')
-            elif re.search('[0-9]', form.password.data) is None:
-                error = 'Make sure your password has a number in it'
-            elif re.search('[A-Z]', form.password.data) is None:
-                error = 'Make sure your password has a capital letter in it'
-            else:
-                user.set_password(form.password.data)
-                db.session.add(user)
-                db.session.commit()
-                flash('Congratulations, you are now a registered user!')
-                return redirect(url_for('login'))
-        flash('Invalid password.', 'error')
-            # return redirect(url_for('register'))
-        return render_template('register.html', title='Register', form=form, error=error)
-    else:
-        return render_template('403.html', title='Forbidden')
-
 def send_email(receiver_email, receiver_name, password):
+    """
+        Sends the user of the newly created account an email with their randomly generated password
+    """
 
-    sender_email = ""
+    # Open email settings
+    smtp_settings = json.load(open("smtp_settings.json"))
+
+    sender_email = smtp_settings["sender_email"]
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "Welcome to Binder!"
     message["From"] = sender_email
     message["To"] = receiver_email
 
+    # TODO: Make these into rendered templates
     # Create the plain-text and HTML version of your message
     text = """\
     Hi, {},
@@ -175,10 +151,14 @@ def send_email(receiver_email, receiver_name, password):
 
     # Create secure connection with server and send email
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-        server.login(sender_email, password)
+    with smtplib.SMTP_SSL(smtp_settings["smtp_url"], smtp_settings["port"], context=context) as server:
+        server.login(sender_email, smtp_settings["password"])
         server.sendmail(sender_email, receiver_email, message.as_string())
+
 class CreateNewUser(Resource):
+    """
+        Makes a new user in the database and then sends the new user their password. 
+    """
     def __init__(self):
         parser = reqparse.RequestParser()
 
@@ -192,6 +172,7 @@ class CreateNewUser(Resource):
         self.args = parser.parse_args()
 
     def post(self):
+        # Checks for proper authorization
         if current_user.authentication_level is 3:
             try:
                 new_user = UserModel(
@@ -204,20 +185,22 @@ class CreateNewUser(Resource):
                     class_jurisdiction=self.args["class_jurisdiction"]
                 )
 
+                # Creates a random password for the new user's account and then adds user to database
                 new_password = passgen(length=12, punctuation=False, digits=True, letters=True, case='both')
-
                 new_user.set_password(new_password)
                 db.session.add(new_user)
                 db.session.commit()
 
+                # Send the new user an email with their new password
                 send_email(self.args["netID"] + '@txstate.edu', self.args["firstname"], new_password)
 
-                return {"status_code": 400, "message": "User " + self.args["netID"] + " successfully created! Please reload the page. "}
+                return { "status": True, "message": "User " + self.args["netID"] + " successfully created! Please reload the page. " }
             except Exception as e: 
-                print(e)
-                return { "status_code": 401, "message": "Error!"}
+                db.session.delete(new_user)
+                db.session.commit()
+                return { "status": False, "message": "Error!" }
         else:
-            return { "status_code": 402, "message": "You do not have the proper credentials to create a user" }
+            return { "status": False, "message": "You do not have the proper credentials to create a user" }
 
 class User(Resource):
     def __init__(self):
@@ -308,6 +291,9 @@ class GetSpecificClass(Resource):
         return jsonify(specific_class = class_schema_many.dump(specific_class).data)
 
 class ChangeUserDepartment(Resource):
+    """
+        In the case that a user changes departments, we are able to change that setting
+    """
     def __init__(self):
         parser = reqparse.RequestParser()
 
@@ -322,12 +308,12 @@ class ChangeUserDepartment(Resource):
                 user = UserModel.query.filter_by(id=self.args["netID"]).first()
                 user.department = self.args["department"]
                 db.session.commit()
-                return { "status_code": 400 }
+                return { "status": True, "message": "User department successfully changed!" }
             except:
-                return { "status_code": 401}
+                return { "status": False, "message": "Error!"}
         
         else:
-            return { "status_code": 402 }
+            return { "status": False, "message": "You do not have the proper credentials to change a user's department." }
 
 class ChangeUserAuthentication(Resource):
     def __init__(self):
@@ -344,11 +330,11 @@ class ChangeUserAuthentication(Resource):
                 user = UserModel.query.filter_by(id=self.args["netID"]).first()
                 user.authentication_level = self.args["authorization"]
                 db.session.commit()
-                return { "status_code": 400 }
+                return { "status": True, "message": "User authentication successfully changed!" }
             except:
-                return { "status_code": 401}
+                return { "status": False, "message": "Error!" }
         else:
-            return { "status_code": 402}
+            return { "status": False, "message": "You do not have the proper credentials to change a user's authentication level." }
 
         
 class GetDepartmentSpecificSemesterYears(Resource):
@@ -386,7 +372,7 @@ class GetClassNumbers(Resource):
 
         page = render_template('classes_frame_template.html', class_numbers = class_numbers, all_classes = all_classes)
         
-        return {"page": page, "class_numbers": class_numbers }
+        return { "page": page, "class_numbers": class_numbers }
 
 class GetClassSections(Resource):
     def __init__(self):
@@ -523,8 +509,8 @@ class Class(Resource):
     # Create a new class
     def post(self):
         try:
-            if current_user.authentication_level < 2:
-                return { "status_code": 400 }
+            if current_user.authentication_level != 2:
+                return { "status": False, "message": "Cannot create class: Improper credentials." }
             # Make the semester ID
             semester_id = current_user.department + "-" + self.args["semester"] + "-" + str(self.args["year"])
 
@@ -546,9 +532,9 @@ class Class(Resource):
             db.session.commit()
 
         except DatabaseError:
-            return { "status_code": 401 }
+            return { "status": False, "message": "Error!" }
 
-        return { "status_code": True }
+        return { "status": True, "message": "Class created!"}
 
     def put(self):
 
@@ -611,13 +597,6 @@ class GetOverridesForSpecificClass(Resource):
 
         return jsonify(overrides=override_schema_many.dump(overrides).data)
 
-        # print(self.args["class_number"])
-        # print(self.args["class_section"])
-        # print(self.args["semester"])
-        # print(self.args["year"])
-
-        # return {}
-
 class AlterMaxCapacity(Resource):
     def __init__(self):
         parser = reqparse.RequestParser()
@@ -628,13 +607,13 @@ class AlterMaxCapacity(Resource):
         self.args = parser.parse_args()
     
     def get(self):
-        if current_user.authentication_level < 2:
-            return { "status_code": 400 }
+        if current_user.authentication_level != 2:
+            return { "status": False, "message": "Cannot alter max capacity: Improper credentials. " }
         university_class = ClassModel.query.filter_by(id = self.args["class_id"]).first()
         university_class.max_capacity = self.args["max_capacity"]
         university_class.percentage_filled = university_class.potentially_enrolled_students / university_class.max_capacity
         db.session.commit()
-        return { "status_code": True }
+        return { "status": True, "message": "Max capacity changed to " + str(self.args["max_capacity"]) }
 
 class DeleteOverride(Resource):
     def __init__(self): 
@@ -667,11 +646,18 @@ class GenerateSemesterFromCatsweb(Resource):
         parser.add_argument('year', type=str)
         
         self.args = parser.parse_args()
+
+        print("\n\n")
+        print(self.args["sid"])
+        print(self.args["PIN"])
+        print(self.args["semester"])
+        print(self.args["year"])
+        print("\n\n")
     
     def post(self):
 
         if current_user.authentication_level != 2:
-            return {"status_code": 402, "message": "Improper credentials"}
+            return {"status": False, "message": "Improper credentials"}
         
         user = UserModel.query.filter_by(id=current_user.id).first()
 
@@ -726,7 +712,7 @@ class GenerateSemesterFromCatsweb(Resource):
             soup = BeautifulSoup(response.text, 'html.parser')
 
             if soup.title is not None:
-                return {"status_code": 401, "message": "Incorrect username or password"}
+                return { "status": False, "message": "Incorrect username or password" }
 
             if new_semester is None:
                 new_semester = SemesterModel(
@@ -738,7 +724,7 @@ class GenerateSemesterFromCatsweb(Resource):
                 db.session.add(new_semester)
                 db.session.commit()
             else:
-                return {"status_code": 402}
+                return {"status": 402}
 
             # Make a request to this link to get a list of all the classes offered at Texas State
             class_jurisdiction_query_string = ""
@@ -871,7 +857,8 @@ class GenerateSemesterFromCatsweb(Resource):
                     continue
 
         db.session.commit()
-        return { "status_code": 400, "message": self.args["semester"] + " " + self.args["year"] + " semester created! Please reload the page. "}
+        print("\n\n" + self.args["semester"] + " " + self.args["year"] + " semester created! Please reload the page. " + "\n\n")
+        return { "status": True, "message": self.args["semester"] + " " + self.args["year"] + " semester created! Please reload the page. "}
 
 class ChangePassword(Resource):
     def __init__(self):
@@ -919,7 +906,7 @@ class Override(Resource):
         try:
             university_class = ClassModel.query.filter_by(year = self.args["year"], class_number = self.args["class_number"], class_section = self.args["class_section"], season = self.args["semester"], department = current_user.department).first()
             if university_class.percentage_filled >= 1:
-                return { "status_code": 401, "message": str(self.args["class_number"]) + "." + str(self.args["class_section"]) + " filled"}
+                return { "status": False, "message": str(self.args["class_number"]) + "." + str(self.args["class_section"]) + " filled"}
             university_class.potentially_enrolled_students = university_class.potentially_enrolled_students + 1
             university_class.percentage_filled = university_class.potentially_enrolled_students / university_class.max_capacity
             today = datetime.date.today()
@@ -940,9 +927,9 @@ class Override(Resource):
             db.session.commit()
 
         except DatabaseError:
-            return { "status_code": 402, "message": "Error"}
+            return { "status": False, "message": "Error. "}
 
-        return { "status_code": 400, "message": "Override for " + self.args["student_name"] + " added to " + str(self.args["class_number"]) + "." + str(self.args["class_section"])}
+        return { "status": True, "message": "Override for " + self.args["student_name"] + " added to " + str(self.args["class_number"]) + "." + str(self.args["class_section"])}
 
     def put(self):
 

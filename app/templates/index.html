@@ -152,52 +152,52 @@
     <div id="generated_individual_class_modal" class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog"
         aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
-            
-                <div id="generated_individual_class_modal_body" class="modal-content">
 
-                    <!-- Override Table -->
+            <div id="generated_individual_class_modal_body" class="modal-content">
 
-                    <table id="generated_individual_classTable" class="table table-striped table-bordered table-sm"
-                        cellspacing="0" width="100%">
-                        <thead>
-                            <tr>
-                                <th class="th-sm">Section
-                                </th>
-                                <th class="th-sm">Days
-                                </th>
-                                <th class="th-sm">Time
-                                </th>
-                                <th class="th-sm">Num Enrollment
-                                </th>
-                                <th class="th-sm">Max Capacity
-                                </th>
-                                <th class="th-sm">Percentage Filled
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="generated_individual_class-table-body">
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Section
-                                </th>
-                                <th>Days
-                                </th>
-                                <th>Time
-                                </th>
-                                <th>Num Enrollment
-                                </th>
-                                <th>Max Capacity
-                                </th>
-                                <th>Percentage Filled
-                                </th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                <!-- Override Table -->
+
+                <table id="generated_individual_classTable" class="table table-striped table-bordered table-sm"
+                    cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="th-sm">Section
+                            </th>
+                            <th class="th-sm">Days
+                            </th>
+                            <th class="th-sm">Time
+                            </th>
+                            <th class="th-sm">Num Enrollment
+                            </th>
+                            <th class="th-sm">Max Capacity
+                            </th>
+                            <th class="th-sm">Percentage Filled
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="generated_individual_class-table-body">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Section
+                            </th>
+                            <th>Days
+                            </th>
+                            <th>Time
+                            </th>
+                            <th>Num Enrollment
+                            </th>
+                            <th>Max Capacity
+                            </th>
+                            <th>Percentage Filled
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
 
 
-                </div>
-            
+            </div>
+
         </div>
     </div>
 
@@ -696,26 +696,26 @@
     <div id="main_container" class="container">
         <div>
             <div class="jumbotron">
-                <h1 class="text-center">Select Semester</h1>
-                <div class="text-left">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="inputGroupSelect01">Semester</label>
+                <div id="main_container_body">
+                    <h1 class="text-center">Select Semester</h1>
+                    <div class="text-left">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="inputGroupSelect01">Semester</label>
+                            </div>
+                            <select id="inputGroupSelect01" class="custom-select">
+                                
+                            </select>
                         </div>
-                        <select id="inputGroupSelect01" class="custom-select">
-                            <!-- <option value="Spring">Spring</option>
-                            <option value="Summer">Summer</option>
-                            <option value="Fall">Fall</option> -->
-                        </select>
-                    </div>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="inputGroupSelect01">Year</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="inputGroupSelect01">Year</label>
+                            </div>
+                            <select id="my_years" class="custom-select">
+                            </select>
                         </div>
-                        <select id="my_years" class="custom-select">
-                        </select>
+                        <button onclick="getClassNumbers(true)" class="btn btn-primary" type="button">Go</button>
                     </div>
-                    <button onclick="getClassNumbers(true)" class="btn btn-primary" type="button">Go</button>
                 </div>
             </div>
         </div>

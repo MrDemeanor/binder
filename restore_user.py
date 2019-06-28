@@ -2,13 +2,15 @@ from app import db
 from app.models import UserModel, SemesterModel, ClassModel, OverrideModel
 
 new_user = UserModel(
-    id = 'mw13', 
-    firstname = 'Max', 
-    lastname = 'Wittorp', 
-    email = 'mw13@txstate.edu', 
-    authentication_level = 3
+    class_jurisdiction = "MGT,B+A",
+    department = "MGT",
+    email = "btr26@txstate.edu",
+    firstname = "Brent",
+    id = "btr26",
+    lastname = "btr26", 
+    authentication_level = 2
 )
 
-new_user.set_password('P@radox1998')
+new_user.set_password('1234')
 db.session.add(new_user)
 db.session.commit()

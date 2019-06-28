@@ -1,43 +1,15 @@
+// Converts our main users table into an interactive DataTable
 $('#users_table').DataTable();
 
-function createNewUser() {
-    url = '/create_new_user'
-
-    firstname = $("#new_admin_first_name").val()
-    lastname = $("#new_admin_last_name").val()
-    netID = $("#new_admin_netID").val()
-    department = $("#new_admin_department").val()
-    authorization_level = $("#new_admin_authorization").val()
-
-    payload = {
-        "firstname": firstname,
-        "lastname": lastname,
-        "netID": netID,
-        "department": department,
-        "authorization_level": authorization_level
-    }
-
-    $.post(url, payload, function (response) {
-        if (response["status_code"] == 400) {
-            $.notify({
-                message: 'User successfully created!'
-            }, {
-                    type: 'success',
-                    placement: {
-                        from: "bottom",
-                        align: "center"
-                    }
-                });
-        } else {
-            $.notify({
-                message: 'User failed to be created!'
-            }, {
-                    type: 'danger',
-                    placement: {
-                        from: "bottom",
-                        align: "center"
-                    }
-                });
+// Streamlines how notifications are pushed to screen
+function display_notification(response) {
+    $.notify({
+        message: response["message"]
+    }, {
+        type: (response["status"] ? 'success' : 'danger'), 
+        placement: {
+            from: "bottom",
+            align: "center"
         }
     })
 }
@@ -53,39 +25,7 @@ function changeUserDepartment() {
         "department": department
     }
 
-    $.post(url, payload, function (response) {
-        if (response["status_code"] == 400) {
-            $.notify({
-                message: 'User department successfully changed!'
-            }, {
-                    type: 'success',
-                    placement: {
-                        from: "bottom",
-                        align: "center"
-                    }
-                });
-        } else if (response["status_code"] == 401) {
-            $.notify({
-                message: 'Error'
-            }, {
-                    type: 'danger',
-                    placement: {
-                        from: "bottom",
-                        align: "center"
-                    }
-                });
-        } else {
-            $.notify({
-                message: 'Improper credentials'
-            }, {
-                    type: 'danger',
-                    placement: {
-                        from: "bottom",
-                        align: "center"
-                    }
-                });
-        }
-    })
+    $.post(url, payload, function (response) { display_notification(response) })
 }
 
 function changeUserAuthentication() {
@@ -99,95 +39,8 @@ function changeUserAuthentication() {
         "authorization": authorization
     }
 
-    $.post(url, payload, function (response) {
-        if (response["status_code"] == 400) {
-            $.notify({
-                message: 'User authentication successfully changed!'
-            }, {
-                    type: 'success',
-                    placement: {
-                        from: "bottom",
-                        align: "center"
-                    }
-                });
-        } else if (response["status_code"] == 401) {
-            $.notify({
-                message: 'Error'
-            }, {
-                    type: 'danger',
-                    placement: {
-                        from: "bottom",
-                        align: "center"
-                    }
-                });
-        } else {
-            $.notify({
-                message: 'Improper credentials'
-            }, {
-                    type: 'danger',
-                    placement: {
-                        from: "bottom",
-                        align: "center"
-                    }
-                });
-        }
-    })
+    $.post(url, payload, function (response) { display_notification(response) })
 }
-
-// /* attach a submit handler to the form */
-// $("#new_user_form").submit(function (event) {
-
-//     /* stop form from submitting normally */
-//     event.preventDefault();
-
-//     /* get the action attribute from the <form action=""> element */
-//     var $form = $(this),
-//         url = $form.attr('action');
-
-//     payload = {
-//         "firstname": $('#new_user_first_name').val(),
-//         "lastname": $('#new_user_last_name').val(),
-//         "netID": $('#new_user_netID').val(),
-//         "department": $('#new_admin_department').val(),
-//         "authorization_level": $('#authorization_level').val()
-//     }
-
-//     $.post(url, payload, function (response) {
-//         if (response["status_code"] == 400) {
-//             $.notify({
-//                 message: response["message"]
-//             }, {
-//                     type: 'success',
-//                     placement: {
-//                         from: "bottom",
-//                         align: "center"
-//                     },
-//                 });
-//         } else if (response["status_code"] == 401) {
-//             $.notify({
-//                 message: response["message"]
-//             }, {
-//                     type: 'danger',
-//                     placement: {
-//                         from: "bottom",
-//                         align: "center"
-//                     }
-//                 });
-//         } else {
-//             $.notify({
-//                 message: response["message"]
-//             }, {
-//                     type: 'danger',
-//                     placement: {
-//                         from: "bottom",
-//                         align: "center"
-//                     }
-//                 });
-//         }
-//     });
-
-// });
-
 
 // Example starter JavaScript for disabling form submissions if there are invalid fields
 (function () {
@@ -195,6 +48,7 @@ function changeUserAuthentication() {
     window.addEventListener('load', function () {
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         var forms = document.getElementsByClassName('new_user_form');
+        
         // Loop over them and prevent submission
         var validation = Array.prototype.filter.call(forms, function (form) {
             form.addEventListener('submit', function (event) {
@@ -216,41 +70,7 @@ function changeUserAuthentication() {
                         "class_jurisdiction": $("#new_admin_class_jurisdiction").val().join()
                     }
 
-                    console.log(url)
-
-                    $.post(url, payload, function (response) {
-                        if (response["status_code"] == 400) {
-                            $.notify({
-                                message: response["message"]
-                            }, {
-                                    type: 'success',
-                                    placement: {
-                                        from: "bottom",
-                                        align: "center"
-                                    }
-                                });
-                        } else if (response["status_code"] == 401) {
-                            $.notify({
-                                message: response["message"]
-                            }, {
-                                    type: 'danger',
-                                    placement: {
-                                        from: "bottom",
-                                        align: "center"
-                                    }
-                                });
-                        } else {
-                            $.notify({
-                                message: response["message"]
-                            }, {
-                                    type: 'danger',
-                                    placement: {
-                                        from: "bottom",
-                                        align: "center"
-                                    }
-                                });
-                        }
-                    });
+                    $.post(url, payload, function (response) { display_notification(response) });
                 }
                 form.classList.add('was-validated');
             }, false);
@@ -281,40 +101,7 @@ function changeUserAuthentication() {
                         "confirm_password": $("#confirm_password").val()
                     }
 
-                    $.post(url, payload, function (response) {
-
-                        if (response["status_code"] == 400) {
-                            $.notify({
-                                message: response["message"]
-                            }, {
-                                    type: 'success',
-                                    placement: {
-                                        from: "bottom",
-                                        align: "center"
-                                    }
-                                });
-                        } else if (response["status_code"] == 401) {
-                            $.notify({
-                                message: response["message"]
-                            }, {
-                                    type: 'danger',
-                                    placement: {
-                                        from: "bottom",
-                                        align: "center"
-                                    }
-                                });
-                        } else if (response["status_code"] == 402) {
-                            $.notify({
-                                message: response["message"]
-                            }, {
-                                    type: 'danger',
-                                    placement: {
-                                        from: "bottom",
-                                        align: "center"
-                                    }
-                                });
-                        }
-                    });
+                    $.post(url, payload, function (response) { display_notification(response) });
                 }
                 form.classList.add('was-validated');
             }, false);
