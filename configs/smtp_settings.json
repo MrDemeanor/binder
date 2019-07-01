@@ -1,0 +1,6 @@
+{
+    "sender_email": "brent.redmon98@gmail.com",
+    "password": "ledzeppelin98", 
+    "port": "465", 
+    "smtp_url": "smtp.gmail.com"
+}

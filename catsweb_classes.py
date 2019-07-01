@@ -18,7 +18,7 @@ def getCatswebClasses(terms, seasons, years):
     c.get(url)
 
     # Open catsweb credentials file
-    catsweb_credentials = json.load(open("catsweb_credentials.json", "r"))
+    catsweb_credentials = json.load(open("configs/catsweb_credentials.json", "r"))
 
     # Supply username and password from credentials file
     payload = {

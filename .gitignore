@@ -4,3 +4,4 @@
 /venv
 *.db
 *.ini
+*.json

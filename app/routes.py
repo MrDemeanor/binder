@@ -108,7 +108,7 @@ def send_email(receiver_email, receiver_name, password):
     """
 
     # Open email settings
-    smtp_settings = json.load(open("smtp_settings.json"))
+    smtp_settings = json.load(open("configs/smtp_settings.json"))
 
     sender_email = smtp_settings["sender_email"]
 
@@ -872,14 +872,14 @@ class ChangePassword(Resource):
     
     def post(self):
         if self.args["new_password"] != self.args["confirm_password"]:
-            return { "status_code": 401, "message": "Passwords must be the same"}
+            return { "status": False, "message": "Passwords must be the same"}
 
         if current_user.check_password(self.args["old_password"]):
             current_user.set_password(self.args["new_password"])
             db.session.commit()
-            return { "status_code": 400, "message": "Password successfully changed"}
+            return { "status": True, "message": "Password successfully changed"}
         else:
-            return { "status_code": 401, "message": "Old password incorrect"}
+            return { "status": False, "message": "Old password incorrect"}
 
 class Override(Resource):
     def __init__(self):
