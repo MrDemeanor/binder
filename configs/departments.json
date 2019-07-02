@@ -1,0 +1,12 @@
+{
+    "departments": [
+        {
+            "screen_name": "Management", 
+            "catsweb_val": "MGT", 
+            "jurisdiction": [
+                "MGT", 
+                "B+A"
+            ]
+        }
+    ]
+}

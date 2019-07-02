@@ -66,8 +66,7 @@ function changeUserAuthentication() {
                         "lastname": $('#new_user_last_name').val(),
                         "netID": $('#new_user_netID').val(),
                         "department": $('#new_admin_department').val(),
-                        "authorization_level": $('#new_admin_authorization').val(), 
-                        "class_jurisdiction": $("#new_admin_class_jurisdiction").val().join()
+                        "authorization_level": $('#new_admin_authorization').val()
                     }
 
                     $.post(url, payload, function (response) { display_notification(response) });

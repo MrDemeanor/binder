@@ -38,10 +38,15 @@ def index():
         Check the level of authentication of the current user. If the current user has Sys Admin
         privileges, render the sys_admin page. Otherwise, load the regular index page.
     """
+    departments = json.load(open("configs/departments.json"))["departments"]
     if current_user.authentication_level < 3:
-        return render_template('index.html', name=current_user.firstname)
+        for department in departments:
+            if current_user.department == department["catsweb_val"]:
+                departments = department
+                break
+
+        return render_template('index.html', name=current_user.firstname, departments=departments)
     else:
-        departments = json.load(open("app/static/departments.json"))["departments"]
         users = UserModel.query.all()
         return render_template('admin.html', name=current_user.firstname, departments=departments, users=users)
 
@@ -167,13 +172,27 @@ class CreateNewUser(Resource):
         parser.add_argument('netID', type=str)
         parser.add_argument('department', type=str)
         parser.add_argument('authorization_level', type=int)
-        parser.add_argument('class_jurisdiction', type=str)
 
         self.args = parser.parse_args()
 
     def post(self):
         # Checks for proper authorization
         if current_user.authentication_level is 3:
+
+            # Create class jurisdiction string
+            departments = json.load(open("configs/departments.json"))
+
+            class_jurisdiction = ""
+
+            for i in range(len(departments["departments"])):
+                if self.args["department"] == departments["departments"][i]["catsweb_val"]:
+                    for j in range(len(departments["departments"][i]["jurisdiction"])):
+                        if j == len(departments["departments"][i]["jurisdiction"]) - 1:
+                            class_jurisdiction = class_jurisdiction + departments["departments"][i]["jurisdiction"][j]
+                        else:
+                            class_jurisdiction = class_jurisdiction + departments["departments"][i]["jurisdiction"][j] + ","
+                    break
+
             try:
                 new_user = UserModel(
                     id=self.args["netID"],
@@ -182,7 +201,7 @@ class CreateNewUser(Resource):
                     email=self.args["netID"] + '@txstate.edu',
                     department=self.args["department"],
                     authentication_level=self.args["authorization_level"],
-                    class_jurisdiction=self.args["class_jurisdiction"]
+                    class_jurisdiction=class_jurisdiction
                 )
 
                 # Creates a random password for the new user's account and then adds user to database
@@ -498,7 +517,8 @@ class Class(Resource):
         parser.add_argument('max_capacity', type=int)
         parser.add_argument('year', type=int)
         parser.add_argument('semester', type=str)
-        
+        parser.add_argument('subject', type=str)
+
         self.args = parser.parse_args()
 
     # Query all of the classes
@@ -526,7 +546,8 @@ class Class(Resource):
                 max_capacity = self.args["max_capacity"], 
                 year = self.args["year"], 
                 season = self.args["semester"],
-                semester=semester
+                semester=semester, 
+                subject = self.args["subject"]
             )
             db.session.add(new_class)
             db.session.commit()

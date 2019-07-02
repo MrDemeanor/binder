@@ -4,7 +4,7 @@ from app.models import UserModel, SemesterModel, ClassModel, OverrideModel
 new_user = UserModel(
     # class_jurisdiction = "MGT,B+A",
     # department = "MGT",
-    email = "admin26@txstate.edu",
+    email = "admin@txstate.edu",
     firstname = "Admin",
     id = "Admin",
     lastname = "Admin", 

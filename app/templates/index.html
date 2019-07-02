@@ -528,38 +528,65 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <form class="new_class_form" id="new_class_form" novalidate action="/class" method="POST">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="col-md-6 mb-3">
+                                <label for="validationCustom01">Subject</label>
+                                <select id="new_class_subject" class="custom-select" name="new_class_subject"
+                                    id="new_admin_department">
+                                    {% for subject in departments['jurisdiction'] %}
+                                    <option value="{{ subject }}">{{ subject }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please provide a subject.
+                                </div>
+                            </div>
 
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon1">Class Number</span>
+                            <div class="col-md-6 mb-3">
+                                <label for="validationCustom01">Class Number</label>
+                                <input type="text" class="form-control" id="new_class_number"
+                                    placeholder="Class Number" required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter class number
+                                </div>
+                            </div>
+
                         </div>
-                        <input id="new_class_class_number" type="text" class="form-control" placeholder="Eg: 3303, 4335"
-                            aria-label="Class Number" aria-describedby="basic-addon1">
-                    </div>
+                        <div class="form-row">
+                            <div class="col-md-6 mb-3">
+                                <label for="validationCustom01">Section</label>
+                                <input type="text" class="form-control" id="new_class_section" placeholder="Section" required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                            </div>
 
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon1">Section</span>
+                            <div class="col-md-6 mb-3">
+                                <label for="validationCustom01">Max Capacity</label>
+                                <input type="text" class="form-control" id="new_class_max_capacity"
+                                    placeholder="Max Capcity" required>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter max capacity
+                                </div>
+                            </div>
+
                         </div>
-                        <input id="new_class_section_number" type="text" class="form-control" placeholder=""
-                            aria-label="Section" aria-describedby="basic-addon1">
-                    </div>
 
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon1">Max Capacity</span>
-                        </div>
-                        <input id="new_class_max_capacity" type="text" class="form-control" placeholder=""
-                            aria-label="Max Capacity" aria-describedby="basic-addon1">
                     </div>
+                    <div class="modal-footer">
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button onclick="createClass(); " type="button" data-dismiss="modal" class="btn btn-primary">Add
-                        Class</button>
-                </div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit">Create Class</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -704,7 +731,7 @@
                                 <label class="input-group-text" for="inputGroupSelect01">Semester</label>
                             </div>
                             <select id="inputGroupSelect01" class="custom-select">
-                                
+
                             </select>
                         </div>
                         <div class="input-group mb-3">

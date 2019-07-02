@@ -130,7 +130,7 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label for="validationCustom03">Department</label>
                                 <select id="new_admin_department" class="custom-select" name="department"
                                     id="new_admin_department">
@@ -142,18 +142,8 @@
                                     Please provide a department.
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="validationCustom03">Class Jurisdiction</label>
-                                <select id="new_admin_class_jurisdiction" class="custom-select" name="department" id="new_admin_class_jurisdiction" multiple>
-                                    {% for department in departments %}
-                                    <option value="{{ department['catsweb_val'] }}">{{ department['screen_name'] }}</option>
-                                    {% endfor %}
-                                </select>
-                                <div class="invalid-feedback">
-                                    Please provide a department.
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
+
+                            <div class="col-md-6 mb-3">
                                 <label for="validationCustom05">Authorization Level</label>
                                 <select id="new_admin_authorization" class="custom-select" name="authorization_level">
                                     <option value="1">Student Worker</option>
