@@ -7,6 +7,20 @@
                 "MGT", 
                 "B+A"
             ]
+        }, 
+        {
+            "screen_name": "Accounting", 
+            "catsweb_val": "ACC", 
+            "jurisdiction": [
+                "ACC"
+            ]
+        }, 
+        {
+            "screen_name": "Finance", 
+            "catsweb_val": "FIN", 
+            "jurisdiction": [
+                "FIN"
+            ]
         }
     ]
 }
